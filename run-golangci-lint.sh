@@ -8,4 +8,8 @@ if ! command -v golangci-lint &> /dev/null ; then
     exit 1
 fi
 
-exec golangci-lint run "$@"
+if test -f "go.work"; then
+    go work edit -json | jq -r '.Use[].DiskPath'  | xargs -I{} golangci-lint run {}/...
+else
+    exec golangci-lint run "$@"
+fi
